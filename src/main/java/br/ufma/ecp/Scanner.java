@@ -14,6 +14,7 @@ public class Scanner {
     private byte[] input;
     private int current;
     private int start;
+    private int line = 1;
 
     private static final Map<String, TokenType> keywords;
 
@@ -58,6 +59,10 @@ public class Scanner {
         while (!endComment) {
             advance();
             char ch = peek();
+
+            if (ch == '\n')
+                line++;
+
             if ( ch == 0) { // eof, lexical error
                 System.exit(1);
             }
