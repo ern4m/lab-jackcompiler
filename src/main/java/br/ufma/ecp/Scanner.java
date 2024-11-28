@@ -203,7 +203,7 @@ public class Scanner {
         TokenType type = keywords.get(id);
         if (type == null)
             type = IDENT;
-        return new Token(type, id);
+        return new Token(type, id, line);
     }
 
     private Token number() {
@@ -212,7 +212,7 @@ public class Scanner {
         }
 
         String num = new String(input, start, current - start, StandardCharsets.UTF_8);
-        return new Token(NUMBER, num);
+        return new Token(NUMBER, num, line);
     }
 
     private Token string() {
@@ -222,7 +222,7 @@ public class Scanner {
             advance();
         }
         String s = new String(input, start, current - start, StandardCharsets.UTF_8);
-        Token token = new Token(TokenType.STRING, s);
+        Token token = new Token(TokenType.STRING, s, line);
         advance();
         return token;
     }
