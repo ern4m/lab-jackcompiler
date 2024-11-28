@@ -49,10 +49,6 @@ public class Scanner {
         start = 0;
     }
 
-    private void skipLineComments() {
-        for (char ch = peek(); ch != '\n' && ch != 0; advance(), ch = peek());
-    }
-
     private void skipBlockComments() {
         boolean endComment = false;
         advance();
@@ -77,6 +73,13 @@ public class Scanner {
 
         }
     }
+    
+    private void skipLineComments() {
+        for (char ch = peek(); ch != '\n' && ch != 0; advance(), ch = peek())
+            if (ch == '\n')
+                line++;
+    }
+
 
     private char peekNext () {
         int next = current + 1;
@@ -90,6 +93,10 @@ public class Scanner {
     private void skipWhitespace() {
         char ch = peek();
         while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n') {
+
+            if (ch == '\n')
+                line++;
+
             advance();
             ch = peek();
         }
