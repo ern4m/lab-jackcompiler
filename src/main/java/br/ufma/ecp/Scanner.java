@@ -52,6 +52,26 @@ public class Scanner {
         for (char ch = peek(); ch != '\n' && ch != 0; advance(), ch = peek());
     }
 
+    private void skipBlockComments() {
+        boolean endComment = false;
+        advance();
+        while (!endComment) {
+            advance();
+            char ch = peek();
+            if ( ch == 0) { // eof, lexical error
+                System.exit(1);
+            }
+         
+            if (ch == '*') {
+               for (ch = peek(); ch == '*';  advance(), ch = peek()) ;
+                if (ch == '/') {
+                    endComment = true;
+                    advance();
+                }
+            }
+
+        }
+    }
     private void skipWhitespace() {
         char ch = peek();
         while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n') {
