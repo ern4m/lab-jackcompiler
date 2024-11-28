@@ -107,9 +107,17 @@ public class Scanner {
 
         switch (ch) {
             case '/':
-                advance();
-                return new Token(TokenType.SLASH, "/");
-
+                if (peekNext() == '/') {
+                    skipLineComments();
+                    return nextToken();
+                } else if (peekNext() == '*') {
+                    skipBlockComments();
+                    return nextToken();
+                }
+                else {
+                    advance();
+                    return new Token (TokenType.SLASH,"/");
+                }
             case '+':
                 advance();
                 return new Token(TokenType.PLUS, "+");
