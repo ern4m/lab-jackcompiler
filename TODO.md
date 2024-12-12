@@ -528,15 +528,15 @@ private StringBuilder xmlOutput = new StringBuilder();
 ### Todo:
 - [x] Parser updates
 - [ ] Token updates
-- [ ] Utility Functions
+- [x] Utility Functions
     - [x] report()
     - [x] error()
-    - [ ] expectPeek()
-    - [ ] nextToken()
-    - [ ] peekTokenIs()
-    - [ ] currentTokenIs()
-    - [ ] printNonTerminal()
-    - [ ] XMLOutput()
+    - [x] expectPeek()
+    - [x] nextToken()
+    - [x] peekTokenIs()
+    - [x] currentTokenIs()
+    - [x] printNonTerminal()
+    - [x] XMLOutput()
 
 - [ ] Expression Parsing
     - [ ] parseExpression()
