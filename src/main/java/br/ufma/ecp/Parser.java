@@ -27,12 +27,109 @@ public class Parser {
         peekToken = scan.nextToken();
     }
 
+    // Expression Parsing
+
+    // Will parse an expression
+    void parseExpression() {
+        printNonTerminal("expression");
+        parseTerm(); // an expression is given in the shape of: expr => term (op term)*
+        while (isOperator(peekToken: type)) {
+            var op = peekToken.type;
+            expectPeek(peekToken.type);
+            parseTerm();
+
+        }
+        printNonTerminal("/expression")
+    }
+
+    // Since one expression is defined by terms, we have to parse terms accordingly to the syntax
+    void parseTerm() {
+        printNonTerminal("term");
+        switch (peekToken.type) {
+            case INTEGER:
+                expectPeek(INTEGER);
+                break;
+            case STRING:
+                expectPeek(STRING);
+                break;
+            case NULL:
+            case TRUE:
+            case FALSE:
+                expectPeek(FALSE, NULL, TRUE);
+                break;
+            case THIS:
+                expectPeek(THIS);
+            case IDENTIFIER:
+                expectPeek(IDENTIFIER);
+                if (peekTokenIs(LPAREN) || peekTokenIs(DOT)) {
+                    parseSubroutineCall();
+                } else {
+                    if (peekTokenIs(LBRACKET)) {
+                        expectPeek(LBRACKET);
+                        parseExpression();
+                        expectPeek(RBRACKET);
+                    }
+                }
+            case LPAREN:
+                expectPeek(LPAREN);
+                parseExpression();
+                expectPeek(RPAREN);
+                break;
+            case MINUS:
+            case NOT:
+                expectPeek(MINUS, NOT);
+                var op  = currentToken.type;
+                parseTerm();
+                break;
+            default:
+                throw error(peekToken,  "term expected");
+        }
+    }
+
+    // In order to parse terms we have to parse Subroutine calls:
+    void parseSubroutineCall() {
+        var nArgs = 0;
+        var ident = currentToken.value();
+
+        if(peekTokenIs(LPAREN)) { // case for classe's own method
+            expectPeek(LPAREN); // method(expressionList)
+            nArgs = parseExpressionList() + 1;
+            expectPeek(RPAREN);
+        } else { // case for an method of other object or an function
+            expectPeek(DOT); // .funcName(expressionList)
+            expectPeek(IDENTIFIER);
+            expectPeek(LPAREN);
+            nArgs += parseExpressionList();
+            expectPeek(RPAREN);
+        }
+    }
+
+    // In order to parse subroutine calls we have to parse expression lists:
+   int parseExpressionList() {
+        printNonTerminal("expressionList");
+        var nArgs = 0;
+
+        if (!peekTokenIs(RPAREN)) { // verifies if next token isn't an RPAREN
+            parseExpression();
+            nArgs = 1;
+        }
+
+        while (peekTokenIs(COMMA)) {
+            expectPeek(COMMA);
+            parseExpression();
+            nArgs++;
+        }
+
+        printNonTerminal("/expressionList");
+
+        return nArgs;
+    }
+
     // Utility Functions
 
     public String XMLOutput() {
         return xmlOutput.toString();
     }
-
 
     // Formats and appends non terminal tokens to the XMLOutput
     private void printNonTerminal(String nterminal) {

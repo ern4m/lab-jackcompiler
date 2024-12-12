@@ -276,7 +276,7 @@ void parseSubroutineBody(String functionName, TokenType subroutineType) {
 // '.' subroutineName '(' expressionList ')
 
 void parseSubroutineCall() {
-    var nArgs = 0;
+    var nArgs = 0; // n será usado, mas é necessário pras chamadas de parsing de expressões
     var ident = currentToken.value();
     var symbol = symbolTable.resolve(ident); // classe ou objeto
 
@@ -343,7 +343,7 @@ void parseStatement() {
 ```java
 int parseExpressionList() {
     printNonTerminal("expressionList");
-    var nArgs = 0;
+    var nArgs = 0; // -> usado pela vmWriter
     if (!peekTokenIs(RPAREN)) // verifica se tem pelo menos uma expressao
     {
         parseExpression();
@@ -373,7 +373,6 @@ void parseExpression() {
         var op = peekToken.type;
         expectPeek(peekToken.type);
         parseTerm();
-        compileOperators(op);
     }
     printNonTerminal("/expression");
 }
@@ -538,11 +537,11 @@ private StringBuilder xmlOutput = new StringBuilder();
     - [x] printNonTerminal()
     - [x] XMLOutput()
 
-- [ ] Expression Parsing
-    - [ ] parseExpression()
-    - [ ] parseTerm()
-    - [ ] parseSubroutineCall()
-    - [ ] parseExpressionList()
+- [x] Expression Parsing
+    - [x] parseExpression()
+    - [x] parseTerm()
+    - [x] parseSubroutineCall()
+    - [x] parseExpressionList()
 
 - [ ] Statement Parsing
     - [ ] parseStatement()
