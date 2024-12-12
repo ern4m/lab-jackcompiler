@@ -526,6 +526,8 @@ private StringBuilder xmlOutput = new StringBuilder();
 ```
 
 ### Todo:
+- [ ] Parser updates
+- [ ] Token updates
 - [ ] Utility Functions
     - [ ] report()
     - [ ] error()
