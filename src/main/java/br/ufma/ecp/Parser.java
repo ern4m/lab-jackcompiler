@@ -27,4 +27,17 @@ public class Parser {
         peekToken = scan.nextToken();
     }
 
+    private static void report(int line, String where, String message) {
+        System.err.println(
+            "[line " + line + "] Error" + where + ": " + message);
+    }
+
+    private ParseError error(Token token, String message) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, " at '" + token.value() + "'", message);
+        }
+        return new ParseError();
+    }
 }

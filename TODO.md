@@ -526,11 +526,11 @@ private StringBuilder xmlOutput = new StringBuilder();
 ```
 
 ### Todo:
-- [ ] Parser updates
+- [x] Parser updates
 - [ ] Token updates
 - [ ] Utility Functions
-    - [ ] report()
-    - [ ] error()
+    - [x] report()
+    - [x] error()
     - [ ] expectPeek()
     - [ ] nextToken()
     - [ ] peekTokenIs()
