@@ -526,7 +526,7 @@ private StringBuilder xmlOutput = new StringBuilder();
 
 ### Todo:
 - [x] Parser updates
-- [ ] Token updates
+- [x] Token updates
 - [x] Utility Functions
     - [x] report()
     - [x] error()
@@ -546,7 +546,7 @@ private StringBuilder xmlOutput = new StringBuilder();
 - [ ] Statement Parsing
     - [x] parseStatement()
     - [x] parseStatements()
-    - [ ] parseLet()
+    - [x] parseLet()
     - [ ] parseWhile()
     - [ ] parseIf()
     - [ ] parseReturn()
