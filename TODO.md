@@ -544,8 +544,8 @@ private StringBuilder xmlOutput = new StringBuilder();
     - [x] parseExpressionList()
 
 - [ ] Statement Parsing
-    - [ ] parseStatement()
-    - [ ] parseStatements()
+    - [x] parseStatement()
+    - [x] parseStatements()
     - [ ] parseLet()
     - [ ] parseWhile()
     - [ ] parseIf()

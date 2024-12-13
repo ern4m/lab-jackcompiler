@@ -1,5 +1,8 @@
 package br.ufma.ecp;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static br.ufma.ecp.token.TokenType.*;
 
 import br.ufma.ecp.token.Token;
@@ -27,7 +30,7 @@ public class Parser {
         peekToken = scan.nextToken();
     }
 
-    // Expression Parsing
+    // // Expression Parsing
 
     // Will parse an expression
     void parseExpression() {
@@ -125,7 +128,72 @@ public class Parser {
         return nArgs;
     }
 
-    // Utility Functions
+    // // Statement Parsing
+
+    // Functions to mannage statement parsing
+    void parseStatement() {
+        switch (peekTokenIs.type) { // will match any possible value for an statement
+            case LET:
+                parseLet();
+                break;
+            case WHILE:
+                parseWhile();
+                break;
+            case IF:
+                parseIf();
+                break;
+            case RETURN:
+                parseReturn();
+                break;
+            case DO:
+                parseDo();
+                break;
+            default:
+                throw error(peekToken, "Expected an statement");
+        }
+    }
+
+    //  Will parse statements as long the peekToken is an valid statement
+    void parseStatements() {
+        printNonTerminal("statements");
+
+        List<TokenType> validStatements = Arrays.asList( // current valid statements
+                                            TokenType.WHILE,
+                                            TokenType.IF,
+                                            TokenType.LET,
+                                            TokenType.DO,
+                                            TokenType.RETURN);
+
+        while (validStatements.contains(peekToken.type)) {
+            parseStatement();
+        }
+        printNonTerminal("/statements");
+    }
+
+    // parsing an LET statement
+    void parseLet() {
+        var isArray = false;
+
+        printNonTerminal("letStatement"); // LET => LET IDENTIFIER ([] || = EXP SEMICOLON)
+
+        expectPeek(LET);
+        expectPeek(IDENTIFIER);
+
+        if (peekTokenIs(LBRACKET)) { // if next token after the IDENTIFIER is an LBRACKET will be an array 'definition'
+            expectPeek(LBRACKET);
+            parseExpression();
+            expectPeek(RBRACKET);
+            isArray = true;
+        }
+        expectPeek(EQ);
+        parseExpression();
+        expectPeek(SEMICOLON);
+
+        printNonTerminal("/letStatement");
+
+    }
+
+    // // Utility Functions
 
     public String XMLOutput() {
         return xmlOutput.toString();
