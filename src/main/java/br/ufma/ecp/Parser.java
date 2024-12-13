@@ -36,13 +36,12 @@ public class Parser {
     void parseExpression() {
         printNonTerminal("expression");
         parseTerm(); // an expression is given in the shape of: expr => term (op term)*
-        while (isOperator(peekToken: type)) {
+        while (isOperator(peekToken.type)) {
             var op = peekToken.type;
             expectPeek(peekToken.type);
             parseTerm();
-
         }
-        printNonTerminal("/expression")
+        printNonTerminal("/expression");
     }
 
     // Since one expression is defined by terms, we have to parse terms accordingly to the syntax
@@ -87,6 +86,7 @@ public class Parser {
             default:
                 throw error(peekToken,  "term expected");
         }
+        printNonTerminal("/term");
     }
 
     // In order to parse terms we have to parse Subroutine calls:
@@ -132,22 +132,22 @@ public class Parser {
 
     // Functions to mannage statement parsing
     void parseStatement() {
-        switch (peekTokenIs.type) { // will match any possible value for an statement
+        switch (peekToken.type) { // will match any possible value for an statement
             case LET:
                 parseLet();
                 break;
-            case WHILE:
-                parseWhile();
-                break;
-            case IF:
-                parseIf();
-                break;
-            case RETURN:
-                parseReturn();
-                break;
-            case DO:
-                parseDo();
-                break;
+            // case WHILE:
+            //     parseWhile();
+            //     break;
+            // case IF:
+            //     parseIf();
+            //     break;
+            // case RETURN:
+            //     parseReturn();
+            //     break;
+            // case DO:
+            //     parseDo();
+            //     break;
             default:
                 throw error(peekToken, "Expected an statement");
         }
