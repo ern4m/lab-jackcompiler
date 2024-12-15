@@ -65,13 +65,12 @@ public class Parser {
                 expectPeek(IDENTIFIER);
                 if (peekTokenIs(LPAREN) || peekTokenIs(DOT)) {
                     parseSubroutineCall();
-                } else {
-                    if (peekTokenIs(LBRACKET)) {
-                        expectPeek(LBRACKET);
-                        parseExpression();
-                        expectPeek(RBRACKET);
-                    }
+                } else if (peekTokenIs(LBRACKET)) {
+                    expectPeek(LBRACKET);
+                    parseExpression();
+                    expectPeek(RBRACKET);
                 }
+                break;
             case LPAREN:
                 expectPeek(LPAREN);
                 parseExpression();
