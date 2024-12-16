@@ -71,6 +71,10 @@ public enum TokenType {
     }
 
     static public boolean isOperator(TokenType type) {
+        System.out.println(type.value);
+        if (type == EOF) {
+            return false;
+        }
         return "+-*/<>=~&|".contains(type.value);
     }
 
