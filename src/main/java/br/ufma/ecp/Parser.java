@@ -350,7 +350,20 @@ public class Parser {
         printNonTerminal("/parameterList");
     }
 
-        //Parsing VarDec
+    //Parsing SubroutineBody
+
+    void parseSubroutineBody(String functionName, TokenType subroutineType) {
+        printNonTerminal("subroutineBody");
+        expectPeek(LBRACE);
+        while (peekTokenIs(VAR)) {
+            parseVarDec();
+        }
+    
+        parseStatements();
+        expectPeek(RBRACE);
+        printNonTerminal("/subroutineBody");
+    }
+
     //Parsing VarDec
 
     // // Utility Functions
