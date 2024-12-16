@@ -209,9 +209,30 @@ public class Parser {
         printNonTerminal("/whileStatement");
     }
 
-    // parsing If
+    // Parsing If
 
+    void parseIf() {
+        printNonTerminal("ifStatement");
     
+        expectPeek(IF);
+        expectPeek(LPAREN);
+        parseExpression();
+        expectPeek(RPAREN);
+    
+        expectPeek(LBRACE);
+        parseStatements();
+        expectPeek(RBRACE);
+    
+        if (peekTokenIs(ELSE))
+        {
+            expectPeek(ELSE);
+            expectPeek(LBRACE);
+            parseStatements();
+            expectPeek(RBRACE);
+        }
+    
+        printNonTerminal("/ifStatement");
+    }
 
     // // Utility Functions
 
