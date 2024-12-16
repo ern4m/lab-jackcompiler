@@ -141,9 +141,9 @@ public class Parser {
             case IF:
                 parseIf();
                 break;
-            // case RETURN:
-            //     parseReturn();
-            //     break;
+            case RETURN:
+                parseReturn();
+                break;
             // case DO:
             //     parseDo();
             //     break;
@@ -234,6 +234,18 @@ public class Parser {
         printNonTerminal("/ifStatement");
     }
 
+    // Parsing Return
+
+    void parseReturn() {
+        printNonTerminal("returnStatement");
+        expectPeek(RETURN);
+        if (!peekTokenIs(SEMICOLON)) {
+            parseExpression();
+        }
+        expectPeek(SEMICOLON);
+        printNonTerminal("/returnStatement");
+    }
+    
     // // Utility Functions
 
     public String XMLOutput() {
