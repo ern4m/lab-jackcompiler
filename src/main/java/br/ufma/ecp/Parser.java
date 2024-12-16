@@ -21,7 +21,6 @@ public class Parser {
 
     public Parser (byte[] input) {
         scan = new Scanner(input);
-
         nextToken();
     }
 
@@ -59,7 +58,7 @@ public class Parser {
     void parseExpression() {
         printNonTerminal("expression");
         parseTerm(); // an expression is given in the shape of: expr => term (op term)*
-        while (isOperator(peekToken.type)) {
+        while (isOperator(peekToken.type.value)) {
             expectPeek(peekToken.type);
             parseTerm();
         }
@@ -237,7 +236,6 @@ public class Parser {
         expectPeek(LPAREN);
         parseExpression();
         expectPeek(RPAREN);
-    
         expectPeek(LBRACE);
         parseStatements();
         expectPeek(RBRACE);
@@ -249,7 +247,6 @@ public class Parser {
             parseStatements();
             expectPeek(RBRACE);
         }
-    
         printNonTerminal("/ifStatement");
     }
 
@@ -258,10 +255,12 @@ public class Parser {
     void parseReturn() {
         printNonTerminal("returnStatement");
         expectPeek(RETURN);
-        if (!peekTokenIs(SEMICOLON)) {
+        if (peekTokenIs(TokenType.SEMICOLON)) {
+            expectPeek(TokenType.SEMICOLON);
+        } else {
             parseExpression();
+            expectPeek(TokenType.SEMICOLON);
         }
-        expectPeek(SEMICOLON);
         printNonTerminal("/returnStatement");
     }
 
@@ -270,7 +269,6 @@ public class Parser {
     void parseDo() {
         printNonTerminal("doStatement");
         expectPeek(DO);
-        expectPeek(IDENTIFIER);
         parseSubroutineCall();
         expectPeek(SEMICOLON);
         printNonTerminal("/doStatement");
@@ -410,6 +408,9 @@ public class Parser {
         return currentToken.type == type;
     }
 
+    boolean isOperator(String operator) {
+        return operator != null && "+-*/<>=~&|".contains(operator);
+    }
 
     // Verifies if the peekToken is the one expected
     private void expectPeek(TokenType... types) {
