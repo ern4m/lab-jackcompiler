@@ -95,6 +95,8 @@ public class Scanner {
         }
 
         switch (ch) {
+            case '"':
+                return string();
             case '/':
                 if (peekNext() == '/') {
                     skipLineComments();
