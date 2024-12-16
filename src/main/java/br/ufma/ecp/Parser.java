@@ -364,46 +364,6 @@ public class Parser {
         printNonTerminal("/subroutineBody");
     }
 
-    //Parsing SubroutineCall
-
-    // subroutineCall -> subroutineName '(' expressionList ')' | (className|varName)
-    // '.' subroutineName '(' expressionList ')
-
-    void parseSubroutineCall() {
-        var nArgs = 0; // n será usado, mas é necessário pras chamadas de parsing de expressões
-        var ident = currentToken.value();
-        var symbol = symbolTable.resolve(ident); // classe ou objeto
-
-        if (peekTokenIs(LPAREN)) { // método da propria classe
-            expectPeek(LPAREN);
-            nArgs = parseExpressionList() + 1;
-            expectPeek(RPAREN);
-        } else {
-            // pode ser um metodo de um outro objeto ou uma função
-            expectPeek(DOT);
-            expectPeek(IDENTIFIER); // nome da função
-            expectPeek(LPAREN);
-            nArgs += parseExpressionList();
-            expectPeek(RPAREN);
-        }
-
-    }
-
-    //Parsing Statements
-
-    void parseStatements() {
-        printNonTerminal("statements");
-        while (peekToken.type == WHILE ||
-                peekToken.type == IF ||
-                peekToken.type == LET ||
-                peekToken.type == DO ||
-                peekToken.type == RETURN) {
-            parseStatement();
-        }
-    
-        printNonTerminal("/statements");
-    }
-
     //Parsing VarDec
     //Parsing VarDec
     //Parsing VarDec
