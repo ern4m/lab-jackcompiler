@@ -60,7 +60,6 @@ public class Parser {
         printNonTerminal("expression");
         parseTerm(); // an expression is given in the shape of: expr => term (op term)*
         while (isOperator(peekToken.type)) {
-            var op = peekToken.type;
             expectPeek(peekToken.type);
             parseTerm();
         }
@@ -102,7 +101,6 @@ public class Parser {
             case MINUS:
             case NOT:
                 expectPeek(MINUS, NOT);
-                var op  = currentToken.type;
                 parseTerm();
                 break;
             default:
