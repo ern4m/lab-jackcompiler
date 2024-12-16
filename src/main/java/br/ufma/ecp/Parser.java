@@ -111,18 +111,16 @@ public class Parser {
 
     // In order to parse terms we have to parse Subroutine calls:
     void parseSubroutineCall() {
-        var nArgs = 0;
-        var ident = currentToken.value();
-
+        expectPeek(IDENTIFIER);
         if(peekTokenIs(LPAREN)) { // case for classe's own method
             expectPeek(LPAREN); // method(expressionList)
-            nArgs = parseExpressionList() + 1;
+            parseExpressionList();
             expectPeek(RPAREN);
         } else { // case for an method of other object or an function
             expectPeek(DOT); // .funcName(expressionList)
             expectPeek(IDENTIFIER);
             expectPeek(LPAREN);
-            nArgs += parseExpressionList();
+            parseExpressionList();
             expectPeek(RPAREN);
         }
     }
