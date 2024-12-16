@@ -305,9 +305,52 @@ public class Parser {
         printNonTerminal("/classVarDec");
     }
 
-    //Parsing VarDec
-    //Parsing VarDec
-    //Parsing VarDec
+    //Parsing SubroutineDec
+
+    void parseSubroutineDec() {
+        printNonTerminal("subroutineDec");
+
+
+        expectPeek(CONSTRUCTOR, FUNCTION, METHOD);
+        var subroutineType = currentToken.type;
+
+        // 'int' | 'char' | 'boolean' | className
+        expectPeek(VOID, INT, CHAR, BOOLEAN, IDENTIFIER);
+        expectPeek(IDENTIFIER);
+
+        var functionName = "." + currentToken.value();
+
+        expectPeek(LPAREN);
+        parseParameterList();
+        expectPeek(RPAREN);
+        parseSubroutineBody(functionName, subroutineType);
+
+        printNonTerminal("/subroutineDec");
+    }
+    
+    //Parsing ParameterList
+
+    void parseParameterList() {
+        printNonTerminal("parameterList");
+    
+        if (!peekTokenIs(RPAREN)) // verifica se tem pelo menos uma expressao
+        {
+            expectPeek(INT, CHAR, BOOLEAN, IDENTIFIER);
+    
+            expectPeek(IDENTIFIER);
+    
+            while (peekTokenIs(COMMA)) {
+                expectPeek(COMMA);
+                expectPeek(INT, CHAR, BOOLEAN, IDENTIFIER);
+    
+                expectPeek(IDENTIFIER);
+            }
+        }
+    
+        printNonTerminal("/parameterList");
+    }
+
+        //Parsing VarDec
     //Parsing VarDec
 
     // // Utility Functions
