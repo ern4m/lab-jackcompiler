@@ -135,12 +135,12 @@ public class Parser {
             case LET:
                 parseLet();
                 break;
-            // case WHILE:
-            //     parseWhile();
-            //     break;
-            // case IF:
-            //     parseIf();
-            //     break;
+            case WHILE:
+                parseWhile();
+                break;
+            case IF:
+                parseIf();
+                break;
             // case RETURN:
             //     parseReturn();
             //     break;
@@ -191,6 +191,27 @@ public class Parser {
         printNonTerminal("/letStatement");
 
     }
+
+    // parsing While
+
+    void parseWhile() {
+        printNonTerminal("whileStatement");
+    
+        expectPeek(WHILE);
+        expectPeek(LPAREN);
+        parseExpression();
+    
+        expectPeek(RPAREN);
+        expectPeek(LBRACE);
+        parseStatements();
+    
+        expectPeek(RBRACE);
+        printNonTerminal("/whileStatement");
+    }
+
+    // parsing If
+
+    
 
     // // Utility Functions
 
