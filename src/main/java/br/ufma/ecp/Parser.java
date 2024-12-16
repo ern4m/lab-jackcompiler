@@ -257,6 +257,59 @@ public class Parser {
         printNonTerminal("/doStatement");
     }
 
+    //Parsing VarDec
+
+    // 'var' type varName ( ',' varName)* ';'
+
+    void parseVarDec() {
+        printNonTerminal("varDec");
+        expectPeek(VAR);
+
+        // 'int' | 'char' | 'boolean' | className
+        expectPeek(INT, CHAR, BOOLEAN, IDENTIFIER);
+
+        expectPeek(IDENTIFIER);
+
+        while (peekTokenIs(COMMA)) {
+            expectPeek(COMMA);
+            expectPeek(IDENTIFIER);
+        }
+
+        expectPeek(SEMICOLON);
+        printNonTerminal("/varDec");
+    }
+
+    //Parsing Class VarDec
+
+        
+    // classVarDec → ( 'static' | 'field' ) type varName ( ',' varName)* ';'
+
+    void parseClassVarDec() {
+        printNonTerminal("classVarDec");
+        expectPeek(FIELD, STATIC);
+
+        // 'int' | 'char' | 'boolean' | className
+        expectPeek(INT, CHAR, BOOLEAN, IDENTIFIER);
+        String type = currentToken.value();
+
+        expectPeek(IDENTIFIER);
+        String name = currentToken.value();
+
+        while (peekTokenIs(COMMA)) {
+            expectPeek(COMMA);
+            expectPeek(IDENTIFIER);
+            name = currentToken.value();
+        }
+
+        expectPeek(SEMICOLON);
+        printNonTerminal("/classVarDec");
+    }
+
+    //Parsing VarDec
+    //Parsing VarDec
+    //Parsing VarDec
+    //Parsing VarDec
+
     // // Utility Functions
 
     public String XMLOutput() {
