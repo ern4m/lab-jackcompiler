@@ -144,9 +144,9 @@ public class Parser {
             case RETURN:
                 parseReturn();
                 break;
-            // case DO:
-            //     parseDo();
-            //     break;
+            case DO:
+                parseDo();
+                break;
             default:
                 throw error(peekToken, "Expected an statement");
         }
@@ -245,7 +245,18 @@ public class Parser {
         expectPeek(SEMICOLON);
         printNonTerminal("/returnStatement");
     }
-    
+
+    //Parsing Do
+
+    void parseDo() {
+        printNonTerminal("doStatement");
+        expectPeek(DO);
+        expectPeek(IDENTIFIER);
+        parseSubroutineCall();
+        expectPeek(SEMICOLON);
+        printNonTerminal("/doStatement");
+    }
+
     // // Utility Functions
 
     public String XMLOutput() {
