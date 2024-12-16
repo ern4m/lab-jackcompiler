@@ -30,6 +30,29 @@ public class Parser {
         peekToken = scan.nextToken();
     }
 
+    void parse() {
+        parseClass();
+    }
+
+    void parseClass() {
+        printNonTerminal("class");
+        expectPeek(CLASS);
+        expectPeek(IDENTIFIER);
+        expectPeek(LBRACE);
+
+        while (peekTokenIs(STATIC) || peekTokenIs(FIELD)) {
+            parseClassVarDec();
+        }
+
+        while (peekTokenIs(FUNCTION) || peekTokenIs(CONSTRUCTOR) || peekTokenIs(METHOD)) {
+            parseSubroutineDec();
+        }
+
+        expectPeek(RBRACE);
+
+        printNonTerminal("/class");
+    }
+
     // // Expression Parsing
 
     // Will parse an expression
