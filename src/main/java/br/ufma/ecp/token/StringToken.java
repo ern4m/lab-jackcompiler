@@ -12,7 +12,7 @@ public class StringToken extends Token {
     }
 
     public String toString() {
-        return "<string> " + lexeme  + " </string>";
+        return "<stringConstant> " + lexeme  + " </stringConstant>";
     }
 
     public String value () {
