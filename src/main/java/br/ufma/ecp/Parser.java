@@ -389,7 +389,21 @@ public class Parser {
 
     }
 
-    //Parsing VarDec
+    //Parsing Statements
+
+    void parseStatements() {
+        printNonTerminal("statements");
+        while (peekToken.type == WHILE ||
+                peekToken.type == IF ||
+                peekToken.type == LET ||
+                peekToken.type == DO ||
+                peekToken.type == RETURN) {
+            parseStatement();
+        }
+    
+        printNonTerminal("/statements");
+    }
+
     //Parsing VarDec
     //Parsing VarDec
     //Parsing VarDec
