@@ -1,53 +1,42 @@
 package br.ufma.ecp.token;
 
-import java.util.Arrays;
+import java.util.List;
 
 public enum TokenType {
- 
-    
+    // symbols
+    LPAREN, RPAREN,
+    LBRACE, RBRACE,
+    LBRACKET,RBRACKET,
+    COMMA, SEMICOLON, DOT,
+    PLUS,  MINUS,ASTERISK, SLASH,
+    AND, OR, NOT,
+    LT, GT, EQ,
 
-    STRING(),
-
-    INTEGER(),
-
-    IDENTIFIER(),
-
-    // keywords
-    WHILE("while"), CLASS("class"),CONSTRUCTOR("constructor"),FUNCTION("function"),
-    METHOD("method"),FIELD("field"),STATIC("static"),VAR("var"),INT("int"),
-    CHAR("char"),BOOLEAN("boolean"),VOID("void"),TRUE("true"),FALSE("false"),
-    NULL("null"),THIS("this"),LET("let"),DO("do"),IF("if"),
-    ELSE("else"), RETURN("return"),
+     // Literals.
+     NUMBER,
+     STRING,
 
 
-    // Symbols
-    PLUS("+"),
-    EQ("="),
-    MINUS("-"),
-    ASTERISK("*"),
-    SLASH("/"),
-    AND("&"),
-    OR("|"),
-    NOT("~"),
-    
-    LT("<"),
-    GT(">"),
-
-    DOT("."),
-    COMMA(","),
-    SEMICOLON(";"),
-    LPAREN("("),
-    RPAREN(")"),
-    LBRACE("{"),
-    RBRACE("}"),
-    LBRACKET("["),
-    RBRACKET("]"),
+     IDENT,
 
 
-    EOF();
+     // keywords
+     METHOD, WHILE, IF, CLASS,
+     CONSTRUCTOR, FUNCTION, FIELD,
+     STATIC, VAR, INT, CHAR,
+     BOOLEAN, VOID, TRUE, FALSE,
+     NULL, THIS, LET, DO, ELSE, RETURN,
 
+     EOF,
+
+     ILLEGAL;
 
     private TokenType() {
+    }
+
+     static public boolean isSymbol (char c) {
+        String symbols = "{}()[].,;+-*/&|<>=~";
+        return symbols.indexOf(c) > -1;
     }
 
     private TokenType(String value) {
@@ -56,28 +45,32 @@ public enum TokenType {
 
     public String value;
 
-
-    public static TokenType fromValue(String value) {
-        return Arrays.stream(TokenType.values())
-                .filter(symbolType -> symbolType.value != null && symbolType.value.equals(value))
-                .findFirst()
-                .orElse(null);
+    static public boolean isKeyword (TokenType type) {
+        List<TokenType> keywords  = 
+            List.of(
+                TokenType.METHOD,
+                TokenType.WHILE,
+                TokenType.IF,
+                TokenType.CLASS,
+                TokenType.CONSTRUCTOR,
+                TokenType.FUNCTION,
+                TokenType.FIELD,
+                TokenType.STATIC,
+                TokenType.VAR,
+                TokenType.INT,
+                TokenType.CHAR,
+                TokenType.BOOLEAN,
+                TokenType.VOID,
+                TokenType.TRUE,
+                TokenType.FALSE,
+                TokenType.NULL,
+                TokenType.THIS,
+                TokenType.LET,
+                TokenType.DO,
+                TokenType.ELSE,
+                TokenType.RETURN
+            );
+            return keywords.contains(type);
     }
 
-
-    static public boolean isSymbol (char c) {
-        String symbols = "{}()[].,;+-*/&|<>=~";
-        return symbols.indexOf(c) > -1;
-    }
-
-    static public boolean isOperator(TokenType type) {
-        return "+-*/<>=~&|".contains(type.value);
-    }
-
-    static public TokenType keyword (String value) {
-      return fromValue(value);
-    }
-
-
-    
 }
