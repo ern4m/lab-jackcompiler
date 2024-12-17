@@ -36,7 +36,7 @@ public class Parser {
     void parseClass() {
         printNonTerminal("class");
         expectPeek(CLASS);
-        expectPeek(IDENTIFIER);
+        expectPeek(IDENT);
         expectPeek(LBRACE);
 
         while (peekTokenIs(STATIC) || peekTokenIs(FIELD)) {
@@ -58,7 +58,7 @@ public class Parser {
     void parseExpression() {
         printNonTerminal("expression");
         parseTerm(); // an expression is given in the shape of: expr => term (op term)*
-        while (isOperator(peekToken.type.value)) {
+        while (isOperator(peekToken.lexeme)) {
             expectPeek(peekToken.type);
             parseTerm();
         }
@@ -69,8 +69,8 @@ public class Parser {
     void parseTerm() {
         printNonTerminal("term");
         switch (peekToken.type) {
-            case INTEGER:
-                expectPeek(INTEGER);
+            case NUMBER:
+                expectPeek(NUMBER);
                 break;
             case STRING:
                 expectPeek(STRING);
@@ -82,9 +82,11 @@ public class Parser {
                 break;
             case THIS:
                 expectPeek(THIS);
-            case IDENTIFIER:
-                expectPeek(IDENTIFIER);
+                break;
+            case IDENT:
+                expectPeek(IDENT);
                 if (peekTokenIs(LPAREN) || peekTokenIs(DOT)) {
+                    expectPeek(DOT);
                     parseSubroutineCall();
                 } else if (peekTokenIs(LBRACKET)) {
                     expectPeek(LBRACKET);
@@ -110,14 +112,14 @@ public class Parser {
 
     // In order to parse terms we have to parse Subroutine calls:
     void parseSubroutineCall() {
-        expectPeek(IDENTIFIER);
+        expectPeek(IDENT);
         if(peekTokenIs(LPAREN)) { // case for classe's own method
             expectPeek(LPAREN); // method(expressionList)
             parseExpressionList();
             expectPeek(RPAREN);
         } else { // case for an method of other object or an function
             expectPeek(DOT); // .funcName(expressionList)
-            expectPeek(IDENTIFIER);
+            expectPeek(IDENT);
             expectPeek(LPAREN);
             parseExpressionList();
             expectPeek(RPAREN);
@@ -189,25 +191,21 @@ public class Parser {
 
     // parsing an LET statement
     void parseLet() {
-        var isArray = false;
-
-        printNonTerminal("letStatement"); // LET => LET IDENTIFIER ([] || = EXP SEMICOLON)
+        printNonTerminal("letStatement"); // LET => LET IDENT ([] || = EXP SEMICOLON)
 
         expectPeek(LET);
-        expectPeek(IDENTIFIER);
+        expectPeek(IDENT);
 
-        if (peekTokenIs(LBRACKET)) { // if next token after the IDENTIFIER is an LBRACKET will be an array 'definition'
+        if (peekTokenIs(LBRACKET)) { // if next token after the IDENT is an LBRACKET will be an array 'definition'
             expectPeek(LBRACKET);
             parseExpression();
             expectPeek(RBRACKET);
-            isArray = true;
         }
         expectPeek(EQ);
         parseExpression();
         expectPeek(SEMICOLON);
 
         printNonTerminal("/letStatement");
-
     }
 
     // parsing While
@@ -283,13 +281,13 @@ public class Parser {
         expectPeek(VAR);
 
         // 'int' | 'char' | 'boolean' | className
-        expectPeek(INT, CHAR, BOOLEAN, IDENTIFIER);
+        expectPeek(INT, CHAR, BOOLEAN, IDENT);
 
-        expectPeek(IDENTIFIER);
+        expectPeek(IDENT);
 
         while (peekTokenIs(COMMA)) {
             expectPeek(COMMA);
-            expectPeek(IDENTIFIER);
+            expectPeek(IDENT);
         }
 
         expectPeek(SEMICOLON);
@@ -306,15 +304,15 @@ public class Parser {
         expectPeek(FIELD, STATIC);
 
         // 'int' | 'char' | 'boolean' | className
-        expectPeek(INT, CHAR, BOOLEAN, IDENTIFIER);
+        expectPeek(INT, CHAR, BOOLEAN, IDENT);
         String type = currentToken.value();
 
-        expectPeek(IDENTIFIER);
+        expectPeek(IDENT);
         String name = currentToken.value();
 
         while (peekTokenIs(COMMA)) {
             expectPeek(COMMA);
-            expectPeek(IDENTIFIER);
+            expectPeek(IDENT);
             name = currentToken.value();
         }
 
@@ -332,8 +330,8 @@ public class Parser {
         var subroutineType = currentToken.type;
 
         // 'int' | 'char' | 'boolean' | className
-        expectPeek(VOID, INT, CHAR, BOOLEAN, IDENTIFIER);
-        expectPeek(IDENTIFIER);
+        expectPeek(VOID, INT, CHAR, BOOLEAN, IDENT);
+        expectPeek(IDENT);
 
         var functionName = "." + currentToken.value();
 
@@ -352,15 +350,15 @@ public class Parser {
     
         if (!peekTokenIs(RPAREN)) // verifica se tem pelo menos uma expressao
         {
-            expectPeek(INT, CHAR, BOOLEAN, IDENTIFIER);
+            expectPeek(INT, CHAR, BOOLEAN, IDENT);
     
-            expectPeek(IDENTIFIER);
+            expectPeek(IDENT);
     
             while (peekTokenIs(COMMA)) {
                 expectPeek(COMMA);
-                expectPeek(INT, CHAR, BOOLEAN, IDENTIFIER);
+                expectPeek(INT, CHAR, BOOLEAN, IDENT);
     
-                expectPeek(IDENTIFIER);
+                expectPeek(IDENT);
             }
         }
     
@@ -380,12 +378,6 @@ public class Parser {
         expectPeek(RBRACE);
         printNonTerminal("/subroutineBody");
     }
-
-    //Parsing VarDec
-    //Parsing VarDec
-    //Parsing VarDec
-    //Parsing VarDec
-    //Parsing VarDec
 
     // // Utility Functions
 
@@ -409,7 +401,7 @@ public class Parser {
     }
 
     boolean isOperator(String operator) {
-        return operator != null && "+-*/<>=~&|".contains(operator);
+        return operator != "" && "+-*/<>=~&|".contains(operator);
     }
 
     // Verifies if the peekToken is the one expected
@@ -444,8 +436,10 @@ public class Parser {
 
     private ParseError error(Token token, String message) {
         if (token.type == TokenType.EOF) {
+            System.out.println("eof error: "+token);
             report(token.line, " at end", message);
         } else {
+            System.out.println("other error: "+ token + peekToken.value());
             report(token.line, " at '" + token.value() + "'", message);
         }
         return new ParseError();
