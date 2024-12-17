@@ -3,12 +3,8 @@ package br.ufma.ecp;
 import static br.ufma.ecp.token.TokenType.*;
 
 import java.nio.charset.StandardCharsets;
-
-import br.ufma.ecp.token.IdentifierToken;
-import br.ufma.ecp.token.IntegerToken;
-import br.ufma.ecp.token.KeywordToken;
-import br.ufma.ecp.token.StringToken;
-import br.ufma.ecp.token.SymbolToken;
+import java.util.HashMap;
+import java.util.Map;
 
 import br.ufma.ecp.token.Token;
 import br.ufma.ecp.token.TokenType;
@@ -19,6 +15,33 @@ public class Scanner {
     private int current;
     private int start;
     private int line = 1;
+
+private static final Map<String, TokenType> keywords;
+
+    static {
+        keywords = new HashMap<>();
+        keywords.put("method", TokenType.METHOD);
+        keywords.put("while", TokenType.WHILE);
+        keywords.put("if", TokenType.IF);
+        keywords.put("class", TokenType.CLASS);
+        keywords.put("constructor", TokenType.CONSTRUCTOR);
+        keywords.put("function", TokenType.FUNCTION);
+        keywords.put("field", TokenType.FIELD);
+        keywords.put("static", TokenType.STATIC);
+        keywords.put("var", TokenType.VAR);
+        keywords.put("int", TokenType.INT);
+        keywords.put("char", TokenType.CHAR);
+        keywords.put("boolean", TokenType.BOOLEAN);
+        keywords.put("void", TokenType.VOID);
+        keywords.put("true", TokenType.TRUE);
+        keywords.put("false", TokenType.FALSE);
+        keywords.put("null", TokenType.NULL);
+        keywords.put("this", TokenType.THIS);
+        keywords.put("let", TokenType.LET);
+        keywords.put("do", TokenType.DO);
+        keywords.put("else", TokenType.ELSE);
+        keywords.put("return", TokenType.RETURN);
+    }
 
     public Scanner(byte[] input) {
         this.input = input;
@@ -106,25 +129,67 @@ public class Scanner {
                     return nextToken();
                 } else {
                     advance();
-                    return new Token(TokenType.SLASH, line);
+                    return new Token(TokenType.SLASH, "/", line);
                 }
+            case '+':
+                advance();
+                return new Token(TokenType.PLUS, "+", line);
+            case '-':
+                advance();
+                return new Token(TokenType.MINUS, "-", line);
+            case '*':
+                advance();
+                return new Token(TokenType.ASTERISK, "*", line);
+            case '.':
+                advance();
+                return new Token(TokenType.DOT, ".", line);
+            case '&':
+                advance();
+                return new Token(TokenType.AND, "&", line);
+            case '|':
+                advance();
+                return new Token(TokenType.OR, "|", line);
+            case '~':
+                advance();
+                return new Token(TokenType.NOT, "~", line);
+            case '>':
+                advance();
+                return new Token(TokenType.GT, ">", line);
+            case '<':
+                advance();
+                return new Token(TokenType.LT, "<", line);
+            case '=':
+                advance();
+                return new Token(TokenType.EQ, "=", line);
+            case '(':
+                advance();
+                return new Token(TokenType.LPAREN, "(", line);
+            case ')':
+                advance();
+                return new Token(TokenType.RPAREN, ")", line);
+            case '{':
+                advance();
+                return new Token(TokenType.LBRACE, "{", line);
+            case '}':
+                advance();
+                return new Token(TokenType.RBRACE, "}", line);
+            case '[':
+                advance();
+                return new Token(TokenType.LBRACKET, "[", line);
+            case ']':
+                advance();
+                return new Token(TokenType.RBRACKET, "]", line);
+            case ';':
+                advance();
+                return new Token(TokenType.SEMICOLON, ";", line);
+            case ',':
+                advance();
+                return new Token(TokenType.COMMA, ",", line);
             case 0:
-                return new Token(TokenType.EOF, line);
+                return new Token(EOF, "EOF", line);
             default:
-
-                if (Character.isDigit(ch)) {
-                    return number();
-                }
-
-                if (Character.isLetter(ch)) {
-                    return identifier();
-                }
-
-                if (TokenType.isSymbol(ch)) {
-                    return symbol();
-                }
-
-                throw new Error(line+":Unexpected character: " + peek());
+                advance();
+                return new Token(ILLEGAL, Character.toString(ch), line);
         }
     }
 
@@ -133,13 +198,10 @@ public class Scanner {
             advance();
 
         String id = new String(input, start, current - start, StandardCharsets.UTF_8);
-        TokenType type = TokenType.keyword(id);
-        if (type == null) {
-            type = TokenType.keyword(id);
-            return new IdentifierToken(id, line);
-        } else {
-            return new KeywordToken(type, line);
-        }
+        TokenType type = keywords.get(id);
+        if (type == null)
+            type = IDENT;
+        return new Token(type, id, line);
     }
 
     private Token number() {
@@ -148,7 +210,7 @@ public class Scanner {
         }
 
         String num = new String(input, start, current - start, StandardCharsets.UTF_8);
-        return new IntegerToken(num, line);
+        return new Token(NUMBER, num, line);
     }
 
     private Token string() {
@@ -158,15 +220,9 @@ public class Scanner {
             advance();
         }
         String s = new String(input, start, current - start, StandardCharsets.UTF_8);
-        Token token = new StringToken(s, line);
+        Token token = new Token(TokenType.STRING, s, line);
         advance();
         return token;
-    }
-
-    private SymbolToken symbol() {
-        var ch = peek();
-        advance();
-        return new SymbolToken(TokenType.fromValue(String.valueOf(ch)), line);
     }
 
     private void advance() {
