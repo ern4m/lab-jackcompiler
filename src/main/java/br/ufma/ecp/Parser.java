@@ -8,6 +8,8 @@ import static br.ufma.ecp.token.TokenType.*;
 import br.ufma.ecp.token.Token;
 import br.ufma.ecp.token.TokenType;
 
+import br.ufma.ecp.token.VMWriter;
+
 public class Parser {
 
     private static class ParseError extends RuntimeException {
@@ -16,6 +18,8 @@ public class Parser {
     private Scanner scan;
     private Token currentToken;
     private Token peekToken;
+
+    private VMWriter vmWriter = new VMWriter();
 
     private StringBuilder xmlOutput = new StringBuilder();
 
@@ -212,15 +216,15 @@ public class Parser {
 
     void parseWhile() {
         printNonTerminal("whileStatement");
-    
+
         expectPeek(WHILE);
         expectPeek(LPAREN);
         parseExpression();
-    
+
         expectPeek(RPAREN);
         expectPeek(LBRACE);
         parseStatements();
-    
+
         expectPeek(RBRACE);
         printNonTerminal("/whileStatement");
     }
@@ -229,7 +233,7 @@ public class Parser {
 
     void parseIf() {
         printNonTerminal("ifStatement");
-    
+
         expectPeek(IF);
         expectPeek(LPAREN);
         parseExpression();
@@ -237,7 +241,7 @@ public class Parser {
         expectPeek(LBRACE);
         parseStatements();
         expectPeek(RBRACE);
-    
+
         if (peekTokenIs(ELSE))
         {
             expectPeek(ELSE);
@@ -296,7 +300,7 @@ public class Parser {
 
     //Parsing Class VarDec
 
-        
+
     // classVarDec → ( 'static' | 'field' ) type varName ( ',' varName)* ';'
 
     void parseClassVarDec() {
@@ -342,26 +346,26 @@ public class Parser {
 
         printNonTerminal("/subroutineDec");
     }
-    
+
     //Parsing ParameterList
 
     void parseParameterList() {
         printNonTerminal("parameterList");
-    
+
         if (!peekTokenIs(RPAREN)) // verifica se tem pelo menos uma expressao
         {
             expectPeek(INT, CHAR, BOOLEAN, IDENT);
-    
+
             expectPeek(IDENT);
-    
+
             while (peekTokenIs(COMMA)) {
                 expectPeek(COMMA);
                 expectPeek(INT, CHAR, BOOLEAN, IDENT);
-    
+
                 expectPeek(IDENT);
             }
         }
-    
+
         printNonTerminal("/parameterList");
     }
 
@@ -373,7 +377,7 @@ public class Parser {
         while (peekTokenIs(VAR)) {
             parseVarDec();
         }
-    
+
         parseStatements();
         expectPeek(RBRACE);
         printNonTerminal("/subroutineBody");
@@ -384,6 +388,11 @@ public class Parser {
     public String XMLOutput() {
         return xmlOutput.toString();
     }
+
+    public String VMOutput() {
+        return vmWriter.vmOutput();
+    }
+
 
     // Formats and appends non terminal tokens to the XMLOutput
     private void printNonTerminal(String nterminal) {
