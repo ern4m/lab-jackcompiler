@@ -232,18 +232,27 @@ public class Parser {
 
     // parsing an LET statement
     void parseLet() {
+        var isArray = false;
         printNonTerminal("letStatement"); // LET => LET IDENT ([] || = EXP SEMICOLON)
 
         expectPeek(LET);
         expectPeek(IDENT);
 
+        var symbol = symTable.resolve(currentToken.lexeme);
+
         if (peekTokenIs(LBRACKET)) { // if next token after the IDENT is an LBRACKET will be an array 'definition'
             expectPeek(LBRACKET);
             parseExpression();
             expectPeek(RBRACKET);
+            isArray = true;
         }
         expectPeek(EQ);
         parseExpression();
+        if (isArray) {
+
+        } else {
+          vmWriter.writePop(kind2Segment(symbol.kind()), symbol.index());
+        }
         expectPeek(SEMICOLON);
 
         printNonTerminal("/letStatement");
