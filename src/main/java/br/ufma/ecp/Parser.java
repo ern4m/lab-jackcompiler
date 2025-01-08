@@ -12,8 +12,7 @@ import br.ufma.ecp.VMWriter;
 import br.ufma.ecp.VMWriter.Command;
 import br.ufma.ecp.VMWriter.Segment;
 
-import br.ufma.ecp.SymbolTable;
-import br.ufma.ecp.SymbolTable.Kind;
+import br.ufma.ecp.SymbolTable.*;
 
 public class Parser {
 
@@ -83,34 +82,6 @@ public class Parser {
         printNonTerminal("/expression");
     }
 
-    public void compileOperators(TokenType type) {
-        if (type == ASTERISK) {
-            vmWriter.writeCall("Math.multiply", 2);
-        } else if (type == SLASH) {
-            vmWriter.writeCall("Math.divide", 2);
-        } else {
-            vmWriter.writeArithmetic(typeOperator(type));
-        }
-    }
-
-    private Command typeOperator(TokenType type) {
-        if (type == PLUS)
-            return Command.ADD;
-        if (type == MINUS)
-            return Command.SUB;
-        if (type == LT)
-            return Command.LT;
-        if (type == GT)
-            return Command.GT;
-        if (type == EQ)
-            return Command.EQ;
-        if (type == AND)
-            return Command.AND;
-        if (type == OR)
-            return Command.OR;
-        return null;
-    }
-
     // Since one expression is defined by terms, we have to parse terms accordingly to the syntax
     void parseTerm() {
         printNonTerminal("term");
@@ -143,13 +114,20 @@ public class Parser {
                 break;
             case IDENT:
                 expectPeek(IDENT);
+
+                Symbol sym = symTable.resolve(currentToken.lexeme);
+
                 if (peekTokenIs(LPAREN) || peekTokenIs(DOT)) {
                     expectPeek(DOT);
                     parseSubroutineCall();
-                } else if (peekTokenIs(LBRACKET)) {
-                    expectPeek(LBRACKET);
-                    parseExpression();
-                    expectPeek(RBRACKET);
+                } else {
+                    if (peekTokenIs(LBRACKET)) {
+                      expectPeek(LBRACKET);
+                      parseExpression();
+                      expectPeek(RBRACKET);
+                    } else {
+                      vmWriter.writePush(kind2Segment(sym.kind()), sym.index());
+                    }
                 }
                 break;
             case LPAREN:
@@ -518,6 +496,45 @@ public class Parser {
         return vmWriter.vmOutput();
     }
 
+    private Segment kind2Segment(Kind kind) {
+        if (kind == Kind.STATIC)
+            return Segment.STATIC;
+        if (kind == Kind.FIELD)
+            return Segment.THIS;
+        if (kind == Kind.VAR)
+            return Segment.LOCAL;
+        if (kind == Kind.ARG)
+            return Segment.ARG;
+        return null;
+    }
+
+    public void compileOperators(TokenType type) {
+        if (type == ASTERISK) {
+            vmWriter.writeCall("Math.multiply", 2);
+        } else if (type == SLASH) {
+            vmWriter.writeCall("Math.divide", 2);
+        } else {
+            vmWriter.writeArithmetic(typeOperator(type));
+        }
+    }
+
+    private Command typeOperator(TokenType type) {
+        if (type == PLUS)
+            return Command.ADD;
+        if (type == MINUS)
+            return Command.SUB;
+        if (type == LT)
+            return Command.LT;
+        if (type == GT)
+            return Command.GT;
+        if (type == EQ)
+            return Command.EQ;
+        if (type == AND)
+            return Command.AND;
+        if (type == OR)
+            return Command.OR;
+        return null;
+    }
 
     // Formats and appends non terminal tokens to the XMLOutput
     private void printNonTerminal(String nterminal) {
