@@ -1,0 +1,30 @@
+package br.ufma.ecp;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import br.ufma.ecp.VMWriter.Command;
+import br.ufma.ecp.VMWriter.Segment;
+
+public class VMWriterTest {
+
+    @Test
+    public void testInt () {
+        var input = """
+            10
+            """;
+
+        var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
+        parser.parseExpression();
+        String actual = parser.VMOutput();
+        String expected = """
+                push constant 10
+                    """;
+            assertEquals(expected, actual);
+    }
+
+}
