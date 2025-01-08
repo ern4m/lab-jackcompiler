@@ -6,6 +6,9 @@ import org.junit.Test;
 
 import br.ufma.ecp.SymbolTable.Kind;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 public class SymbolTableTest {
     @Test
     public void testSimpleFunctions () {

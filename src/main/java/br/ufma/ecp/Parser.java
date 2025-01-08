@@ -13,6 +13,7 @@ import br.ufma.ecp.VMWriter.Command;
 import br.ufma.ecp.VMWriter.Segment;
 
 import br.ufma.ecp.SymbolTable;
+import br.ufma.ecp.SymbolTable.Kind;
 
 public class Parser {
 
@@ -29,6 +30,7 @@ public class Parser {
     private int whileLabelNum = 0;
 
     private SymbolTable symTable = new SymbolTable();
+    private String className = "";
 
     private StringBuilder xmlOutput = new StringBuilder();
 
@@ -50,6 +52,7 @@ public class Parser {
         printNonTerminal("class");
         expectPeek(CLASS);
         expectPeek(IDENT);
+        className = currentToken.lexeme;
         expectPeek(LBRACE);
 
         while (peekTokenIs(STATIC) || peekTokenIs(FIELD)) {
@@ -446,7 +449,7 @@ public class Parser {
         expectPeek(VOID, INT, CHAR, BOOLEAN, IDENT);
         expectPeek(IDENT);
 
-        var functionName = "." + currentToken.value();
+        var functionName = className + "." + currentToken.lexeme;
 
         expectPeek(LPAREN);
         parseParameterList();
@@ -496,6 +499,9 @@ public class Parser {
         while (peekTokenIs(VAR)) {
             parseVarDec();
         }
+        var nlocals = symTable.varCount(Kind.VAR);
+
+        vmWriter.writeFunction(functionName, nlocals);
 
         parseStatements();
         expectPeek(RBRACE);
