@@ -64,12 +64,42 @@ public class Parser {
     // Will parse an expression
     void parseExpression() {
         printNonTerminal("expression");
-        parseTerm(); // an expression is given in the shape of: expr => term (op term)*
-        while (isOperator(peekToken.lexeme)) {
+        parseTerm();
+        while (peekTokenIs(PLUS, MINUS, ASTERISK, SLASH, LT, GT, EQ, AND, OR)) {
+            var ope = peekToken.type;
             expectPeek(peekToken.type);
             parseTerm();
+            compileOperators(ope);
         }
         printNonTerminal("/expression");
+    }
+
+    public void compileOperators(TokenType type) {
+        if (type == ASTERISK) {
+            vmWriter.writeCall("Math.multiply", 2);
+        } else if (type == SLASH) {
+            vmWriter.writeCall("Math.divide", 2);
+        } else {
+            vmWriter.writeArithmetic(typeOperator(type));
+        }
+    }
+
+    private Command typeOperator(TokenType type) {
+        if (type == PLUS)
+            return Command.ADD;
+        if (type == MINUS)
+            return Command.SUB;
+        if (type == LT)
+            return Command.LT;
+        if (type == GT)
+            return Command.GT;
+        if (type == EQ)
+            return Command.EQ;
+        if (type == AND)
+            return Command.AND;
+        if (type == OR)
+            return Command.OR;
+        return null;
     }
 
     // Since one expression is defined by terms, we have to parse terms accordingly to the syntax
@@ -404,8 +434,13 @@ public class Parser {
     }
 
     // Used to verify the next token to be parsed
-    boolean peekTokenIs(TokenType type) {
-        return peekToken.type == type;
+    boolean peekTokenIs(TokenType... types) {
+        for (TokenType type : types) {
+            if (peekToken.type == type) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Used to verify the type of current token that's being parsed
