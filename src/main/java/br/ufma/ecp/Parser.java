@@ -118,7 +118,6 @@ public class Parser {
                 Symbol sym = symTable.resolve(currentToken.lexeme);
 
                 if (peekTokenIs(LPAREN) || peekTokenIs(DOT)) {
-                    expectPeek(DOT);
                     parseSubroutineCall();
                 } else {
                     if (peekTokenIs(LBRACKET)) { // array
@@ -395,9 +394,11 @@ public class Parser {
     void parseDo() {
         printNonTerminal("doStatement");
         expectPeek(DO);
+        expectPeek(IDENT);
         parseSubroutineCall();
         expectPeek(SEMICOLON);
         vmWriter.writePop(Segment.TEMP, 0);
+
         printNonTerminal("/doStatement");
     }
 
