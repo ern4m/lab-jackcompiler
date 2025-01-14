@@ -121,12 +121,19 @@ public class Parser {
                     expectPeek(DOT);
                     parseSubroutineCall();
                 } else {
-                    if (peekTokenIs(LBRACKET)) {
-                      expectPeek(LBRACKET);
-                      parseExpression();
-                      expectPeek(RBRACKET);
+                    if (peekTokenIs(LBRACKET)) { // array
+                        expectPeek(LBRACKET);
+                        parseExpression();
+                        vmWriter.writePush(kind2Segment(sym.kind()), sym.index());
+                        vmWriter.writeArithmetic(Command.ADD);
+        
+
+                        expectPeek(RBRACKET);
+                        vmWriter.writePop(Segment.POINTER, 1); // pop address pointer into pointer 1
+                        vmWriter.writePush(Segment.THAT, 0);   // push the value of the address pointer back onto stack
+        
                     } else {
-                      vmWriter.writePush(kind2Segment(sym.kind()), sym.index());
+                        vmWriter.writePush(kind2Segment(sym.kind()), sym.index());
                     }
                 }
                 break;
@@ -149,6 +156,7 @@ public class Parser {
                 throw error(peekToken,  "term expected");
         }
         printNonTerminal("/term");
+        
     }
 
     // In order to parse terms we have to parse Subroutine calls:
@@ -240,24 +248,40 @@ public class Parser {
 
         var symbol = symTable.resolve(currentToken.lexeme);
 
-        if (peekTokenIs(LBRACKET)) { // if next token after the IDENT is an LBRACKET will be an array 'definition'
+        if (peekTokenIs(LBRACKET)) { // array
             expectPeek(LBRACKET);
             parseExpression();
+            
+            vmWriter.writePush(kind2Segment(symbol.kind()), symbol.index());
+            vmWriter.writeArithmetic(Command.ADD);
+    
             expectPeek(RBRACKET);
+
+
+
             isArray = true;
         }
+
         expectPeek(EQ);
         parseExpression();
+
         if (isArray) {
 
+            vmWriter.writePop(Segment.TEMP, 0);    // push result back onto stack
+            vmWriter.writePop(Segment.POINTER, 1); // pop address pointer into pointer 1
+            vmWriter.writePush(Segment.TEMP, 0);   // push result back onto stack
+            vmWriter.writePop(Segment.THAT, 0);    // Store right hand side evaluation in THAT 0.
+    
+
         } else {
-          vmWriter.writePop(kind2Segment(symbol.kind()), symbol.index());
+            vmWriter.writePop(kind2Segment(symbol.kind()), symbol.index());
         }
         expectPeek(SEMICOLON);
 
         printNonTerminal("/letStatement");
     }
 
+    
     // parsing While
 
     void parseWhile() {
