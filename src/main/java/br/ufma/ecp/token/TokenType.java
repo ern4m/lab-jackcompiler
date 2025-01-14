@@ -39,6 +39,10 @@ public enum TokenType {
         return symbols.indexOf(c) > -1;
     }
 
+    static public boolean isOperator(TokenType type) {
+        return "+-*/<>=~&|".contains(type.value);
+    }
+
     private TokenType(String value) {
         this.value = value;
     }
@@ -46,7 +50,7 @@ public enum TokenType {
     public String value;
 
     static public boolean isKeyword (TokenType type) {
-        List<TokenType> keywords  = 
+        List<TokenType> keywords  =
             List.of(
                 TokenType.METHOD,
                 TokenType.WHILE,
